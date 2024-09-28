@@ -1,46 +1,42 @@
 pipeline {
-    parameters {
-            booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
-    }
-    environment {
-        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-    }
-
    agent  any
+   tools {
+     terraform 'terraform'
+   }
     stages {
             stage('checkout') {
                 steps {
                      script{
-                         git credentialsId: 'GIT', branch: ${GIT_REF}, url: 'https://github.com/SilviaHr/terraform-infrastructure.git'
+                         git credentialsId: 'GIT', branch: params.GIT_REF, url: 'https://github.com/SilviaHr/terraform-infrastructure.git'
                      }
                 }
             }
-
-        stage('Plan') {
+        stage('Terraform Init') {
             steps {
-                sh """
-                   pwd;cd terraform-infrastructure/${params.TF_MODULE} ; terraform init
-                   pwd;cd terraform-infrastructure/${params.TF_MODULE}; terraform plan -out tfplan
-                   pwd;cd terraform-infrastructure/${params.TF_MODULE} ; terraform show -no-color tfplan > tfplan.txt
-                   """
+                withAWS(region:'eu-north-1') {
+                  dir("${TF_MODULE}") {
+                    sh 'terraform init'
+                  }
+                }
             }
         }
-
-//           steps {
-//               script {
-//                     def plan = readFile 'terraform-infrastructure/${TF_MODULE}/tfplan.txt'
-//                     input message: "Do you want to apply the plan?",
-//                     parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
-//               }
-//           }
-//       }
-//
-//         stage('Apply') {
-//             steps {
-//                 sh "pwd;cd terraform-infrastructure/${TF_MODULE} ; terraform apply --auto-approve -input=false tfplan"
-//             }
-//         }
-//      }
-
-  }
+         stage('Terraform Plan') {
+             steps {
+                withAWS(region:'eu-north-1') {
+                   dir("${TF_MODULE}") {
+                     sh 'terraform plan -out=tfplan'
+                   }
+                }
+             }
+         }
+         stage('Terraform Apply') {
+             steps {
+                 withAWS(region:'eu-north-1') {
+                   dir("${TF_MODULE}") {
+                     sh 'terraform apply -auto-approve tfplan'
+                   }
+                 }
+             }
+         }
+    }
+}

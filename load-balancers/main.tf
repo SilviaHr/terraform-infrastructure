@@ -4,9 +4,6 @@ provider "aws" {
 }
 
 
-
-
-
 # Create a Security Group for an ALB listening on banking.app.com
 resource "aws_security_group" "app_alb" {
   name = "application-alb"
