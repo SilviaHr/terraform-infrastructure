@@ -26,7 +26,7 @@ resource "aws_security_group" "app_alb" {
 }
 
 import {
-  id = data.aws_security_groups.app-alb
+  id = "sg-0006536dc0d1cdf56"
   to = aws_security_group.app_alb
 }
 
@@ -54,6 +54,6 @@ resource "aws_security_group" "grafana_alb" {
 }
 
 import {
-  id = data.aws_security_groups.grafana-alb
+  id = "sg-0c98010fd3478d5a2"
   to = aws_security_group.grafana_alb
 }
