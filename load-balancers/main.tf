@@ -9,7 +9,9 @@ resource "aws_security_group" "app_alb" {
   name = "application-alb"
   description = "Security group for external application load balancer"
   vpc_id      = var.vpc_id
-  
+  tags = {
+    Source = "terraform"
+  }
   ingress {
     from_port	  = 443
 	  to_port		  = 443
@@ -26,7 +28,7 @@ resource "aws_security_group" "app_alb" {
 }
 
 import {
-  id = "sg-0006536dc0d1cdf56"
+  id = "sg-04b57b44811cc4258"
   to = aws_security_group.app_alb
 }
 
@@ -37,7 +39,9 @@ resource "aws_security_group" "grafana_alb" {
   name = "grafana-alb"
   description = "Security group for internal grafana load balancer"
   vpc_id      = var.vpc_id
-
+  tags = {
+    Source = "terraform"
+  }
   ingress {
     from_port	  = 443
     to_port		  = 443
@@ -54,6 +58,6 @@ resource "aws_security_group" "grafana_alb" {
 }
 
 import {
-  id = "sg-0c98010fd3478d5a2"
+  id = "sg-07d2863f7ce2a771f"
   to = aws_security_group.grafana_alb
 }
