@@ -26,7 +26,7 @@ resource "aws_security_group" "app_alb" {
 }
 
 import {
-  id = "application-alb"
+  id = data.aws_security_groups.app-alb
   to = aws_security_group.app_alb
 }
 
@@ -54,6 +54,6 @@ resource "aws_security_group" "grafana_alb" {
 }
 
 import {
-  id = "grafana-alb"
+  id = data.aws_security_groups.grafana-alb
   to = aws_security_group.grafana_alb
 }
